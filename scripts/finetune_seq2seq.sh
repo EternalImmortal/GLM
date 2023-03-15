@@ -1,6 +1,6 @@
-DATA_ROOT=/root/data
-CHECKPOINT_PATH=/dataset/fd5061f6/pretrained_models
-SAVE_PATH=/dataset/fd5061f6/finetune_checkpoints
+DATA_ROOT=/data/text2music/cnn-dailymail
+CHECKPOINT_PATH=/data/text2music/glm-10b-chinese.zip
+SAVE_PATH=/data/text2music/glm-checkpoint
 DATESTR=$(date +"%m-%d-%H-%M")
 
 source $1    # Model
@@ -26,12 +26,28 @@ python -m torch.distributed.launch $DISTRIBUTED_ARGS finetune_glm.py \
        --data-dir ${DATA_PATH} \
        --save ${SAVE_PATH} \
        --checkpoint-activations \
-       --epochs ${EPOCH_SINGLE} \
-       --batch-size ${BATCH_SINGLE} \
-       --lr ${LR_SINGLE} \
+       --epochs 1 \
+       --batch-size 16 \
+       --lr 0.001 \
        $MODEL_ARGS \
        $TRAIN_ARGS \
        $COMMON_ARGS \
        $TASK_ARGS \
        2>&1 | tee logs/log-${EXPERIMENT_NAME}.txt
 
+#mkdir logs
+#python -m torch.distributed.launch $DISTRIBUTED_ARGS finetune_glm.py \
+#       --finetune \
+#       --experiment-name ${EXPERIMENT_NAME} \
+#       --task ${TASK_NAME} \
+#       --data-dir ${DATA_PATH} \
+#       --save ${SAVE_PATH} \
+#       --checkpoint-activations \
+#       --epochs ${EPOCH_SINGLE} \
+#       --batch-size ${BATCH_SINGLE} \
+#       --lr ${LR_SINGLE} \
+#       $MODEL_ARGS \
+#       $TRAIN_ARGS \
+#       $COMMON_ARGS \
+#       $TASK_ARGS \
+#       2>&1 | tee logs/log-${EXPERIMENT_NAME}.txt
